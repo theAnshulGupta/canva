@@ -32,8 +32,7 @@ export const App = () => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const text = await response.json();
-      console.log(text.extractedText);
+      console.log(response);
     } catch (error) {
       console.error("Failed to fetch data:", error);
       setResponseContent("Failed to load data. Please try again.");
