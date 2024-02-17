@@ -34,7 +34,7 @@ type AppElementData = {
 type UIState = AppElementData;
 
 const initialState: UIState = {
-  text: "Hello world",
+  text: "Hello world?",
   color: "#ff0099",
   fontWeight: "normal",
   fontStyle: "normal",

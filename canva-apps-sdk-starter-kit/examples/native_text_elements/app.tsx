@@ -27,7 +27,7 @@ type UIState = {
 };
 
 const initialState: UIState = {
-  text: "Hello world",
+  text: "Hello :(",
   color: "#ff0099",
   fontWeight: "normal",
   fontStyle: "normal",
