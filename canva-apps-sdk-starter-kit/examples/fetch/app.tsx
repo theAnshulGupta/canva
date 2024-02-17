@@ -10,7 +10,7 @@ import { auth } from "@canva/user";
 import React, { useState } from "react";
 import styles from "styles/components.css";
 
-const BACKEND_URL = `${BACKEND_HOST}/custom-route`;
+const BACKEND_URL = `${BACKEND_HOST}/openai`;
 
 type State = "idle" | "loading" | "success" | "error";
 
@@ -25,9 +25,10 @@ export const App = () => {
       setState("loading");
       const token = await auth.getCanvaUserToken();
       const res = await fetch(BACKEND_URL, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        method: "POST",
+        body: JSON.stringify({prompt: 'give me a poem'}),
+        headers: new Headers({'content-type': 'application/json', 'Authorization': `Bearer ${token}`}),
+
       });
 
       const body = await res.json();

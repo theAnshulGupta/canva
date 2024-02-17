@@ -3,6 +3,30 @@ import * as express from "express";
 import * as cors from "cors";
 import { createBaseServer } from "../../../utils/backend/base_backend/create";
 import { createJwtMiddleware } from "../../../utils/backend/jwt_middleware";
+// const { Configuration, OpenAIApi } = require("openai");
+
+import OpenAI from "openai";
+
+const open_ai = new OpenAI({apiKey: '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', dangerouslyAllowBrowser: true});
+
+//   apiKey: process.env.OPENAI_API_KEY, // Ensure you have your API key stored in the environment variables
+export async function submitPromptAndGetResponse(prompt) {
+  try {
+    const completion = await open_ai.chat.completions.create({
+      messages: [{ role: "system", content: "You are a helpful assistant." }, {
+        "role": "user",
+        "content": prompt
+    }
+    ],
+      model: "gpt-4-turbo-preview",
+    });
+  
+    return completion.choices[0];
+
+  } catch (error) {
+    console.error("Error in submitting prompt and getting response:", error);
+  }
+}
 
 async function main() {
   // TODO: Set the CANVA_APP_ID environment variable in the project's .env file
@@ -15,6 +39,8 @@ async function main() {
   }
 
   const router = express.Router();
+
+
 
   /**
    * TODO: Configure your CORS Policy
@@ -60,6 +86,31 @@ async function main() {
       brandId: req.canva.brandId,
     });
   });
+
+  // const configuration = new Configuration({
+  //   apiKey: process.env.OPENAI_KEY, // Ensure your API key is stored securely
+  // });
+  // const openai = new OpenAIApi(configuration);
+
+  router.post("/openai", jwtMiddleware, async (req, res) => {
+    if (req.body.prompt == "") {
+      return res.status(400).json({ error: 'Prompt is required.' });
+    }
+    try {
+      // const openaiResponse = await openai.createCompletion({
+      //   model: "text-davinci-003",
+      //   prompt: prompt,
+      //   max_tokens: 150
+      // });
+      const response = await submitPromptAndGetResponse(req.body.prompt);
+      res.json({"response": response});
+      console.log('OpenAI POST in server.ts');
+    } catch (error) {
+      console.error('Error calling OpenAI API:');
+      res.status(500).json({ error: 'Failed to call OpenAI API.' });
+    }
+  });
+
 
   const server = createBaseServer(router);
   server.start(process.env.CANVA_BACKEND_PORT);

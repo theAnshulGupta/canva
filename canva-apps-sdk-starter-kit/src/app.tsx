@@ -37,58 +37,58 @@ export const App = () => {
 
 
 
-  // const [state, setState] = useState<State>("idle");
-  // const [responseBody, setResponseBody] = useState<unknown | undefined>(
-  //   undefined
-  // );
+  const [state, setState] = useState<State>("idle");
+  const [responseBody, setResponseBody] = useState<unknown | undefined>(
+    undefined
+  );
 
-  // const sendGetRequest = async () => {
-  //   try {
-  //     setState("loading");
-  //     const token = await auth.getCanvaUserToken();
-  //     const res = await fetch(BACKEND_URL, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     const body = await res.json();
-  //     setResponseBody(body);
-  //     setState("success");
-  //   } catch (error) {
-  //     setState("error");
-  //     console.error(error);
-  //   }
-  // };
-
-  const [state, setState] = useState("idle");
-  const [responseBody, setResponseBody] = useState(undefined);
-
-  const sendOpenAIRequest = async () => {
+  const sendGetRequest = async () => {
     try {
       setState("loading");
-      const token = await auth.getCanvaUserToken(); // Obtain JWT token
-      const res = await fetch(BACKEND_HOST_OPENAI, {
-        method: "POST",
+      const token = await auth.getCanvaUserToken();
+      const res = await fetch(BACKEND_URL, {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Send JWT in the Authorization header
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ prompt: "Your hardcoded prompt here" }),
       });
-  
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-  
+
       const body = await res.json();
       setResponseBody(body);
       setState("success");
     } catch (error) {
-      console.error(error);
       setState("error");
+      console.error(error);
     }
   };
+
+  // const [state, setState] = useState("idle");
+  // const [responseBody, setResponseBody] = useState(undefined);
+
+  // const sendOpenAIRequest = async () => {
+  //   try {
+  //     setState("loading");
+  //     const token = await auth.getCanvaUserToken(); // Obtain JWT token
+  //     const res = await fetch(BACKEND_HOST_OPENAI, {
+  //       method: "POST",
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${token}`, // Send JWT in the Authorization header
+  //       },
+  //       body: JSON.stringify({ prompt: "Your hardcoded prompt here" }),
+  //     });
+  
+  //     if (!res.ok) {
+  //       throw new Error(`HTTP error! status: ${res.status}`);
+  //     }
+  
+  //     const body = await res.json();
+  //     setResponseBody(body);
+  //     setState("success");
+  //   } catch (error) {
+  //     console.error(error);
+  //     setState("error");
+  //   }
+  // };
 
 
 
@@ -108,7 +108,7 @@ export const App = () => {
           <>
             <Button
               variant="primary"
-              onClick={sendOpenAIRequest}
+              onClick={sendGetRequest}
               loading={state === "loading"}
               stretch
             >

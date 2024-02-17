@@ -1,8 +1,8 @@
 require("dotenv").config();
 import * as express from "express";
 import * as cors from "cors";
-import { createBaseServer } from "../canva-apps-sdk-starter-kit/utils/backend/base_backend/create" //../../utils/backend/base_backend/create";
-import { createJwtMiddleware } from "../canva-apps-sdk-starter-kit/utils/backend/jwt_middleware"//"../../../utils/backend/jwt_middleware";
+import { createBaseServer } from "./utils/backend/base_backend/create" //../../utils/backend/base_backend/create";
+import { createJwtMiddleware } from "./utils/backend/jwt_middleware"//"../../../utils/backend/jwt_middleware";
 const { Configuration, OpenAIApi } = require("openai");
 
 
@@ -44,29 +44,29 @@ async function main() {
     });
   });
 
-  const configuration = new Configuration({
-    apiKey: process.env.OPENAI_KEY, // Ensure your API key is stored securely
-  });
-  const openai = new OpenAIApi(configuration);
+  // const configuration = new Configuration({
+  //   apiKey: process.env.OPENAI_KEY, // Ensure your API key is stored securely
+  // });
+  // const openai = new OpenAIApi(configuration);
 
-  router.post("/openai", jwtMiddleware, async (req, res) => {
-    const { prompt } = req.body;
-    if (!prompt) {
-      return res.status(400).json({ error: 'Prompt is required.' });
-    }
-    try {
-      const openaiResponse = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: prompt,
-        max_tokens: 150
-      });
-      res.json(openaiResponse.data);
-      console.log('OpenAI POST in server.ts');
-    } catch (error) {
-      console.error('Error calling OpenAI API:', error.message);
-      res.status(500).json({ error: 'Failed to call OpenAI API.' });
-    }
-  });
+  // router.post("/openai", jwtMiddleware, async (req, res) => {
+  //   const { prompt } = req.body;
+  //   if (!prompt) {
+  //     return res.status(400).json({ error: 'Prompt is required.' });
+  //   }
+  //   try {
+  //     const openaiResponse = await openai.createCompletion({
+  //       model: "text-davinci-003",
+  //       prompt: prompt,
+  //       max_tokens: 150
+  //     });
+  //     res.json(openaiResponse.data);
+  //     console.log('OpenAI POST in server.ts');
+  //   } catch (error) {
+  //     console.error('Error calling OpenAI API:', error.message);
+  //     res.status(500).json({ error: 'Failed to call OpenAI API.' });
+  //   }
+  // });
 
   // router.post("/openai", jwtMiddleware, async (req, res) => {
   //   const { prompt } = req.body;
@@ -136,6 +136,8 @@ async function main() {
 
   const server = createBaseServer(router);
   server.start(process.env.CANVA_BACKEND_PORT);
+  // server.start(3001);
+
 }
 
 main();
