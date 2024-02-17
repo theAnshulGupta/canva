@@ -3,9 +3,32 @@ import * as express from "express";
 import * as cors from "cors";
 import { createBaseServer } from "./utils/backend/base_backend/create" //../../utils/backend/base_backend/create";
 import { createJwtMiddleware } from "./utils/backend/jwt_middleware"//"../../../utils/backend/jwt_middleware";
-const { Configuration, OpenAIApi } = require("openai");
 
 
+import OpenAI from "openai";
+
+const openai_key = process.env.OPENAI_KEY;
+
+const open_ai = new OpenAI({apiKey: openai_key, dangerouslyAllowBrowser: true});
+
+//   apiKey: process.env.OPENAI_API_KEY, // Ensure you have your API key stored in the environment variables
+export async function submitPromptAndGetResponse(prompt) {
+  try {
+    const completion = await open_ai.chat.completions.create({
+      messages: [{ role: "system", content: "You are a helpful assistant." }, {
+        "role": "user",
+        "content": prompt
+    }
+    ],
+      model: "gpt-4-turbo-preview",
+    });
+  
+    return completion.choices[0];
+
+  } catch (error) {
+    console.error("Error in submitting prompt and getting response:", error);
+  }
+}
 
 async function main() {
 
@@ -44,95 +67,24 @@ async function main() {
     });
   });
 
-  // const configuration = new Configuration({
-  //   apiKey: process.env.OPENAI_KEY, // Ensure your API key is stored securely
-  // });
-  // const openai = new OpenAIApi(configuration);
-
-  // router.post("/openai", jwtMiddleware, async (req, res) => {
-  //   const { prompt } = req.body;
-  //   if (!prompt) {
-  //     return res.status(400).json({ error: 'Prompt is required.' });
-  //   }
-  //   try {
-  //     const openaiResponse = await openai.createCompletion({
-  //       model: "text-davinci-003",
-  //       prompt: prompt,
-  //       max_tokens: 150
-  //     });
-  //     res.json(openaiResponse.data);
-  //     console.log('OpenAI POST in server.ts');
-  //   } catch (error) {
-  //     console.error('Error calling OpenAI API:', error.message);
-  //     res.status(500).json({ error: 'Failed to call OpenAI API.' });
-  //   }
-  // });
-
-  // router.post("/openai", jwtMiddleware, async (req, res) => {
-  //   const { prompt } = req.body;
-  //   if (!prompt) {
-  //     return res.status(400).json({ error: 'Prompt is required.' });
-  //   }
-  //   try {
-  //     const response = await fetch('https://api.openai.com/v1/completions', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': `Bearer ${process.env.OPENAI_KEY}` // Make sure this is correctly set
-  //       },
-  //       body: JSON.stringify({
-  //         model: 'text-davinci-003',
-  //         prompt: prompt,
-  //         max_tokens: 150
-  //       })
-  //     });
-  
-  //     if (!response.ok) {
-  //       throw new Error(`Failed to call OpenAI API. Status: ${response.status}`);
-  //     }
-  
-  //     const openaiResponse = await response.json();
-  //     res.json(openaiResponse);
-  //     console.log('OpenAI POST in server.ts');
-  
-  //   } catch (error) {
-  //     console.error('Error calling OpenAI API:', error);
-  //     // Removed the log for OPENAI_API_KEY to prevent accidental exposure of sensitive data
-  //     res.status(500).json({ error: 'Failed to call OpenAI API.' });
-  //   }
-  // });
-
-  // router.post("/openai", async (req, res) => {
-  //   const { prompt } = req.body;
-  //   if (!prompt) {
-  //     return res.status(400).json({ error: 'Prompt is required.' });
-  //   }
-  //   try {
-  //     const openaiResponse = await axios.post(
-  //       'https://api.openai.com/v1/completions',
-  //       {
-  //         model: 'text-davinci-003',
-  //         prompt: prompt,
-  //         max_tokens: 150
-  //       },
-  //       {
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           'Authorization': `Bearer ${process.env.OPENAI_KEY}` // Changed to OPENAI_KEY
-  //         }
-  //       }
-  //     );
-  //     res.json(openaiResponse.data);
-  //     console.log('openai post in server.ts')
-
-
-  //   } catch (error) {
-  //     console.error('Error calling OpenAI API:', error);
-  //     console.log(process.env.OPENAI_API_KEY); // Add this for debugging purposes
-
-  //     res.status(500).json({ error: 'Failed to call OpenAI API.' });
-  //   }
-  // });
+  router.post("/openai", jwtMiddleware, async (req, res) => {
+    if (req.body.prompt == "") {
+      return res.status(400).json({ error: 'Prompt is required.' });
+    }
+    try {
+      // const openaiResponse = await openai.createCompletion({
+      //   model: "text-davinci-003",
+      //   prompt: prompt,
+      //   max_tokens: 150
+      // });
+      const response = await submitPromptAndGetResponse(req.body.prompt);
+      res.json({"response": response});
+      console.log('OpenAI POST in server.ts');
+    } catch (error) {
+      console.error('Error calling OpenAI API:');
+      res.status(500).json({ error: 'Failed to call OpenAI API.' });
+    }
+  });
 
   const server = createBaseServer(router);
   server.start(process.env.CANVA_BACKEND_PORT);
