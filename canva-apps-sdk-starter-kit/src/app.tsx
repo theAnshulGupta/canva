@@ -7,6 +7,8 @@ import {
   Title,
   TextInput,
 } from "@canva/app-ui-kit";
+import { addPage } from "@canva/design";
+
 import styles from "styles/components.css";
 
 export const App = () => {
@@ -16,7 +18,7 @@ export const App = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch("https://google.com", {
+      const response = await fetch("https://", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
