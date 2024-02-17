@@ -53,7 +53,7 @@ The app will appear in the side panel.
 
 ### (Optional) Step 3: Enable Hot Module Replacement
 
-By default, every time you make a change to an app, you have to reload the entire app to see the results of those changes. If you enable [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/) (HMR), changes will be reflected without a full reload, which significantly speeds up the development loop.
+By default, every time you make a change to an app, you have to reload the entire app to see the results of those changes. If you enable [Hot Module Replacement](https://webpawebpck.js.org/concepts/hot-module-replacement/) (HMR), changes will be reflected without a full reload, which significantly speeds up the development loop.
 
 **Note:** HMR does **not** work while running the development server in a Docker container.
 
