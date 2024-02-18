@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Button,
   Rows,
@@ -15,6 +16,11 @@ import { requestOpenExternalUrl } from "@canva/platform";
 import type { NativeEmbedElement } from "@canva/design";
 import { auth } from "@canva/user";
 import React, { useState, useEffect } from "react";
+  Title,
+  TextInput,
+} from "@canva/app-ui-kit";
+import { addPage } from "@canva/design";
+
 import styles from "styles/components.css";
 import {
   addPage,
@@ -170,7 +176,13 @@ export const App = () => {
     event.target.disabled = true;
     event.preventDefault();
     try {
-      const response = await extractText(link);
+      const response = await fetch("https://", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: link }),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -226,6 +238,12 @@ export const App = () => {
     event.target.parentNode.style = "";
     event.target.style = "";
     event.target.disabled = false;
+      const data = await response.json();
+      setResponseContent(JSON.stringify(data, null, 2));
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+      setResponseContent("Failed to load data. Please try again.");
+    }
   };
 
   // // Function to process and manipulate the response body
@@ -272,7 +290,6 @@ export const App = () => {
         },
       ],
     });
-    await handleClick(activeColor);
     await handleClick(activeColor);
     // Use a for...of loop to iterate over slides, allowing for await within the loop
     for (const slide of responseBody.slides) {
@@ -393,7 +410,7 @@ export const App = () => {
               // handleClick(activeColor);
             }}
           >
-            Generate Presentation
+           Generate Presentation
           </Button>
           {responseContent && (
             <Text>
