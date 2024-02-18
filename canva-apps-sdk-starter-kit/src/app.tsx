@@ -92,7 +92,7 @@ async function handleClick(colorName: string) {
     thumbnailUrl: url,
   });
 
-  let scaledImg = Math.random() * (300 - 100) + 50;
+  let scaledImg = Math.random() * (200 - 100) + 50;
 
   let rotation = Math.random() * (180 - -180) + -180;
 

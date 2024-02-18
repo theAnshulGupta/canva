@@ -7,8 +7,6 @@ import { createJwtMiddleware } from "../../../utils/backend/jwt_middleware";
 
 import OpenAI from "openai";
 
-const open_ai = new OpenAI({apiKey: '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', dangerouslyAllowBrowser: true});
-
 //   apiKey: process.env.OPENAI_API_KEY, // Ensure you have your API key stored in the environment variables
 export async function submitPromptAndGetResponse(prompt) {
   try {
