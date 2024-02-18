@@ -54,8 +54,8 @@ async function main() {
 
   router.use(cors(corsOptions));
 
-  const jwtMiddleware = createJwtMiddleware(APP_ID);
-  router.use(jwtMiddleware);
+  // const jwtMiddleware = createJwtMiddleware(APP_ID);
+  // router.use(jwtMiddleware);
 
   /*
    * TODO: Define your backend routes after initializing the jwt middleware.
@@ -69,7 +69,8 @@ async function main() {
     });
   });
 
-  router.post("/openai", jwtMiddleware, async (req, res) => {
+  // router.post("/openai", jwtMiddleware, async (req, res) => {
+    router.post("/openai", async (req, res) => {
     if (req.body.prompt == "") {
       return res.status(400).json({ error: 'Prompt is required.' });
     }

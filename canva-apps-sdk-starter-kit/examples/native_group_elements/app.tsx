@@ -1,31 +1,39 @@
 import React from "react";
 import { Button, Rows, Text } from "@canva/app-ui-kit";
-import { addNativeElement } from "@canva/design";
+import { addNativeElement, addPage } from "@canva/design";
 import styles from "styles/components.css";
 
 export const App = () => {
   const handleClick = () => {
-    addNativeElement({
-      type: "GROUP",
-      children: [
-        {
-          type: "EMBED",
-          url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          width: 100,
-          height: 100,
-          top: 0,
-          left: 0,
-        },
-        {
-          type: "EMBED",
-          url: "https://www.youtube.com/watch?v=o-YBDTqX_ZU",
-          width: 100,
-          height: 100,
-          top: 0,
-          left: 100,
-        },
-      ],
-    });
+    {
+      await addPage({
+        elements: [
+          // headerElement
+          {
+            type: "GROUP",
+            children: [
+              {
+                type: "TEXT",
+                children: ["title title"], // Center align -- run calculations to find center of page - content offset
+                top:0,
+                left:0,
+                width:200,
+              },
+              {
+                type: "TEXT",
+                children: ["body body"], // Center align -- run calculations to find center of page - content offset
+                top:0,
+                left:0,
+                width:200,
+              },
+            ],
+            top:0,
+            left:0,
+            width: 600,
+            height: "auto"
+          },
+        ],
+      });
   };
 
   return (

@@ -20,7 +20,9 @@ import { addPage } from "@canva/design";
 import {extractText} from "./extractText";
 
 const BACKEND_URL = `${BACKEND_HOST}/custom-route`;
-const BACKEND_HOST_OPENAI = `${BACKEND_HOST}/openai`; // Change 3000 to your server's port
+// const BACKEND_HOST_OPENAI = `${BACKEND_HOST}/openai`; // Change 3000 to your server's port
+// http://localhost:3001/openai
+const BACKEND_HOST_OPENAI = `http://localhost:3001/openai`
 
 type State = "idle" | "loading" | "success" | "error";
 export function parseJsonFromString(text) {
@@ -30,15 +32,24 @@ export function parseJsonFromString(text) {
   if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
     throw new Error('Invalid string format for JSON parsing.');
   }
-
   const jsonString = text.substring(startIndex, endIndex + 1).replace(/(\r\n|\n|\r)/gm,"");
   console.log(jsonString);
+
   try {
     return JSON.parse(jsonString);
   } catch (error) {
     console.error('Failed to parse JSON:', error);
     throw new Error('Failed to parse JSON.');
   }
+
+  // const jsonString = text.substring(startIndex, endIndex + 1).replace(/(\r\n|\n|\r)/gm,"");
+  // console.log(jsonString);
+  // try {
+  //   return JSON.parse(jsonString);
+  // } catch (error) {
+  //   console.error('Failed to parse JSON:', error);
+  //   throw new Error('Failed to parse JSON.');
+  // }
 }
 
 export const App = () => {
@@ -115,20 +126,23 @@ export const App = () => {
               type: "TEXT",
               children: [responseBody.title], // Center align -- run calculations to find center of page - content offset
               top:0,
-              left:0,
-              width:200,
+              left:50,
+              width:700,
+              fontSize: 50,
+              fontWeight: "bold",
             },
             {
               type: "TEXT",
               children: [responseBody.authors], // Center align -- run calculations to find center of page - content offset
-              top:0,
-              left:0,
-              width:200,
+              top: 300,
+              left: 50,
+              width:700,
+              fontSize: 35,
             },
           ],
-          top:0,
-          left:0,
-          width: 500,
+          top:200,
+          left:50,
+          width: 700,
           height: "auto"
         },
       ],
@@ -146,19 +160,22 @@ export const App = () => {
               children: [slide.heading],
               top: 0,
               left: 0,
-              width: 200,
+              width: 700,
+              fontSize: 35,
+              textAlign: "center",
             },
             {
               type: "TEXT",
               children: [slide.body],
-              top: 50, 
+              top: 150, 
               left: 0,
-              width: 200,
+              width: 700,
+              fontSize: 25,
             },
           ],
-          top: 0,
-          left: 0,
-          width: 500,
+          top: 50,
+          left: 50,
+          width: 700,
           height: "auto",
         },
       ],
