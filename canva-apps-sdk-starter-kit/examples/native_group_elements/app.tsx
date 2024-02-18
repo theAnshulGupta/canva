@@ -4,37 +4,39 @@ import { addNativeElement, addPage } from "@canva/design";
 import styles from "styles/components.css";
 
 export const App = () => {
-  const handleClick = () => {
-    {
-      await addPage({
-        elements: [
-          // headerElement
-          {
-            type: "GROUP",
-            children: [
-              {
-                type: "TEXT",
-                children: ["title title"], // Center align -- run calculations to find center of page - content offset
-                top:0,
-                left:0,
-                width:200,
-              },
-              {
-                type: "TEXT",
-                children: ["body body"], // Center align -- run calculations to find center of page - content offset
-                top:0,
-                left:0,
-                width:200,
-              },
-            ],
-            top:0,
-            left:0,
-            width: 600,
-            height: "auto"
-          },
-        ],
-      });
-  };
+  async function handleClick() {
+    await addPage({
+      elements: [
+        // headerElement
+        {
+          type: "GROUP",
+          children: [
+            {
+              type: "TEXT",
+              children: ["Conclusion TITLE TITLE TITLE"], // Center align -- run calculations to find center of page - content offset
+              top: 0,
+              left: 0,
+              width: 1200,
+              fontSize: 90,
+              fontWeight: "bold",
+            },
+            {
+              type: "TEXT",
+              children: ["Islamophobia poses a significant "], // Center align -- run calculations to find center of page - content offset
+              top: 0,
+              left: 0,
+              width: 200,
+              fontSize: 36,
+            },
+          ],
+          top: 200, //1080
+          left: 300, //1920
+          width: 600,
+          height: "auto",
+        },
+      ],
+    });
+  }
 
   return (
     <div className={styles.scrollContainer}>
