@@ -1,1 +1,4 @@
 node_modules/
+bun.lock
+.env
+canva-apps-sdk-starter-kitcopy/

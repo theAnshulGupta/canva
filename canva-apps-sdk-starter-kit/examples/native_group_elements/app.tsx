@@ -1,32 +1,42 @@
 import React from "react";
 import { Button, Rows, Text } from "@canva/app-ui-kit";
-import { addNativeElement } from "@canva/design";
+import { addNativeElement, addPage } from "@canva/design";
 import styles from "styles/components.css";
 
 export const App = () => {
-  const handleClick = () => {
-    addNativeElement({
-      type: "GROUP",
-      children: [
+  async function handleClick() {
+    await addPage({
+      elements: [
+        // headerElement
         {
-          type: "EMBED",
-          url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          width: 100,
-          height: 100,
-          top: 0,
-          left: 0,
-        },
-        {
-          type: "EMBED",
-          url: "https://www.youtube.com/watch?v=o-YBDTqX_ZU",
-          width: 100,
-          height: 100,
-          top: 0,
-          left: 100,
+          type: "GROUP",
+          children: [
+            {
+              type: "TEXT",
+              children: ["Conclusion TITLE TITLE TITLE"], // Center align -- run calculations to find center of page - content offset
+              top: 0,
+              left: 0,
+              width: 1200,
+              fontSize: 90,
+              fontWeight: "bold",
+            },
+            {
+              type: "TEXT",
+              children: ["Islamophobia poses a significant "], // Center align -- run calculations to find center of page - content offset
+              top: 0,
+              left: 0,
+              width: 200,
+              fontSize: 36,
+            },
+          ],
+          top: 200, //1080
+          left: 300, //1920
+          width: 600,
+          height: "auto",
         },
       ],
     });
-  };
+  }
 
   return (
     <div className={styles.scrollContainer}>
