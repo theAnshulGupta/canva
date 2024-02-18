@@ -21,9 +21,10 @@ export async function submitPromptAndGetResponse(prompt) {
     }
     ],
       model: "gpt-4-turbo-preview",
+      response_format: { type: "json_object" },
     });
   
-    return completion.choices[0];
+    return completion.choices[0].message.content;
 
   } catch (error) {
     console.error("Error in submitting prompt and getting response:", error);
@@ -72,11 +73,6 @@ async function main() {
       return res.status(400).json({ error: 'Prompt is required.' });
     }
     try {
-      // const openaiResponse = await openai.createCompletion({
-      //   model: "text-davinci-003",
-      //   prompt: prompt,
-      //   max_tokens: 150
-      // });
       const response = await submitPromptAndGetResponse(req.body.prompt);
       res.json({"response": response});
       console.log('OpenAI POST in server.ts');
