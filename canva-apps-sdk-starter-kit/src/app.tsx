@@ -28,9 +28,33 @@ export function parseJsonFromString(text) {
   const startIndex = text.indexOf('{');
   const endIndex = text.lastIndexOf('}');
 
+
   if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
     throw new Error('Invalid string format for JSON parsing.');
   }
+
+export const App = () => {
+  const [state, setState] = useState<State>("idle");
+  const [responseBody, setResponseBody] = useState<unknown | undefined>(
+    undefined
+  );
+
+  const sendGetRequest = async () => {
+    try {
+      setState("loading");
+      const token = await auth.getCanvaUserToken();
+      const res = await fetch(BACKEND_HOST_OPENAI, {
+        method: "POST",
+        body: JSON.stringify({
+          prompt:
+            "Based on a research paper on mental health The Impact of Urban Green Spaces on Mental Health, generate a 6 slide presentation in the following structure:\n\nIntroduction and background on topic\nKey contributions / novelties\nResults / datapoints\nImpact / contributions / caveats\n\n, and present things as slideshows aimed for a presentation for the general public\n\nUse 2-3 comprehensive, clear, but insightful and value-adding full sentence bullet points per slide max, and generate a sub heading for each slide. Do not make up data and do not make up things that you do not know. Emphasize specific results and data points\n\nRefer to the document, results, and actions. Return it in json format in the following json format, it has a title and body paragraph. the json return object come in the format with +title, then a list of +slides then for each slide it contains a +heading and a +body. Follow these field names for the json return object strictly, they are annotated with a + but dont include the '+' in the result",
+        }),
+        headers: new Headers({
+          "content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        }),
+      });
+
 
   const jsonString = text.substring(startIndex, endIndex + 1).replace(/(\r\n|\n|\r)/gm,"");
   console.log(jsonString);
@@ -46,6 +70,7 @@ export const App = () => {
   const [link, setLink] = useState("");
   const [responseContent, setResponseContent] = useState("");
 
+// need to check
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -56,6 +81,20 @@ export const App = () => {
       }
 
       const text = await response.text();
+//end of welton
+      // The content includes JSON within a string, wrapped in triple backticks.
+      // We need to extract the JSON part. This might require more sophisticated parsing,
+      // especially if the triple backticks can be part of the actual content.
+      const jsonContentString = contentString
+        .split("```json")[1]
+        .split("```")[0]
+        .trim();
+
+      // Parse the JSON string into an object
+      const jsonContent = JSON.parse(jsonContentString);
+
+      setResponseBody(jsonContent);
+
 
       try {
         const token = await auth.getCanvaUserToken();
@@ -105,7 +144,6 @@ export const App = () => {
   // }
 
   async function handleNewClick(responseBody) {
-
     await addPage({
       elements: [
         // headerElement
@@ -115,9 +153,11 @@ export const App = () => {
             {
               type: "TEXT",
               children: [responseBody.title], // Center align -- run calculations to find center of page - content offset
-              top:0,
-              left:0,
-              width:200,
+              top: 100,
+              left: 50,
+              width: 600,
+              fontWeight: "bold",
+              fontSize: 40,
             },
             {
               type: "TEXT",
@@ -127,46 +167,50 @@ export const App = () => {
               width:200,
             },
           ],
-          top:0,
-          left:0,
-          width: 500,
-          height: "auto"
-        },
-      ],
-    });
-
-    // Use a for...of loop to iterate over slides, allowing for await within the loop
-  for (const slide of responseBody.slides) {
-    await addPage({
-      elements: [
-        {
-          type: "GROUP",
-          children: [
-            {
-              type: "TEXT",
-              children: [slide.heading],
-              top: 0,
-              left: 0,
-              width: 200,
-            },
-            {
-              type: "TEXT",
-              children: [slide.body],
-              top: 50, 
-              left: 0,
-              width: 200,
-            },
-          ],
-          top: 0,
-          left: 0,
-          width: 500,
+          top: 150,
+          left: 50,
+          width: 800,
           height: "auto",
         },
       ],
     });
 
-    await new Promise(resolve => setTimeout(resolve, 5000));
-  }
+    // Use a for...of loop to iterate over slides, allowing for await within the loop
+    for (const slide of responseBody.slides) {
+      await addPage({
+        elements: [
+          {
+            type: "GROUP",
+            children: [
+              {
+                type: "TEXT",
+                children: [slide.heading],
+                top: 0,
+              left: 0,
+              width: 800,
+              fontWeight: "bold",
+              textAlign: "center",
+              fontSize: 48,
+              },
+              {
+                type: "TEXT",
+                children: [slide.body],
+                top: 200,
+              left: 100,
+              width: 600,
+              fontSize:35,
+              },
+            ],
+            top: 50,
+          left: 50,
+          width: 700,
+          height: "auto",
+          },
+        ],
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
 
     // responseBody.slides.forEach( (slide) => {
     //    addPage({
@@ -197,10 +241,9 @@ export const App = () => {
     //         height: "auto"
     //       },
     //     ],
-    //   });  
+    //   });
     //   new Promise(resolve => setTimeout(resolve, 3500));
     // });
-
   }
 
   return (
@@ -243,26 +286,3 @@ export const App = () => {
   );
 };
 
-// const [state, setState] = useState<State>("idle");
-// const [responseBody, setResponseBody] = useState<unknown | undefined>(
-//   undefined
-// );
-
-// const sendGetRequest = async () => {
-//   try {
-//     setState("loading");
-//     const token = await auth.getCanvaUserToken();
-//     const res = await fetch(BACKEND_URL, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-
-//     const body = await res.json();
-//     setResponseBody(body);
-//     setState("success");
-//   } catch (error) {
-//     setState("error");
-//     console.error(error);
-//   }
-// };
