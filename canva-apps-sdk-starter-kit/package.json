@@ -30,6 +30,7 @@
     "@canva/preview": "./sdk/preview",
     "@canva/user": "^1.0.0",
     "axios": "^1.6.7",
+    "bun": "^1.0.27",
     "clsx": "^1.2.1",
     "cookie-parser": "^1.4.6",
     "openai": "^4.28.0",

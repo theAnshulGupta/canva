@@ -1,8 +1,8 @@
 require("dotenv").config();
 import * as express from "express";
 import * as cors from "cors";
-import { createBaseServer } from "./utils/backend/base_backend/create" //../../utils/backend/base_backend/create";
-import { createJwtMiddleware } from "./utils/backend/jwt_middleware"//"../../../utils/backend/jwt_middleware";
+import { createBaseServer } from "../../utils/backend/base_backend/create" //../../utils/backend/base_backend/create";
+import { createJwtMiddleware } from "../../utils/backend/jwt_middleware"//"../../../utils/backend/jwt_middleware";
 
 
 import OpenAI from "openai";
@@ -47,7 +47,8 @@ async function main() {
   const canva_app_id = process.env.CANVA_APP_ID?.toLowerCase();
 
   const corsOptions = {
-    origin: `https://app-${canva_app_id}.canva-apps.com`,
+    // origin: `https://app-${canva_app_id}.canva-apps.com`,
+    origin: "*",
     optionsSuccessStatus: 200 
   };
 

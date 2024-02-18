@@ -1,10 +1,10 @@
 import {
   Button,
-  FormField,
-  MultilineInput,
   Rows,
   Text,
+  ImageCard,
   Title,
+  TextInput,
 } from "@canva/app-ui-kit";
 import type {
   Dimensions,
@@ -17,11 +17,21 @@ import React, { useState, useEffect } from "react";
 import styles from "styles/components.css";
 import { addNativeElement } from "@canva/design";
 import { addPage } from "@canva/design";
+import {extractText} from "./extractText";
+import * as designer from "./designer";
 
 const BACKEND_URL = `${BACKEND_HOST}/custom-route`;
 const BACKEND_HOST_OPENAI = `${BACKEND_HOST}/openai`; // Change 3000 to your server's port
 
 type State = "idle" | "loading" | "success" | "error";
+export function parseJsonFromString(text) {
+  const startIndex = text.indexOf('{');
+  const endIndex = text.lastIndexOf('}');
+
+
+  if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
+    throw new Error('Invalid string format for JSON parsing.');
+  }
 
 export const App = () => {
   const [state, setState] = useState<State>("idle");
@@ -45,12 +55,33 @@ export const App = () => {
         }),
       });
 
-      // const body = await res.json();
-      const body = await res.json();
-      // const processedResponse = processResponseBody(body);
 
-      const contentString = body.response.message.content;
+  const jsonString = text.substring(startIndex, endIndex + 1).replace(/(\r\n|\n|\r)/gm,"");
+  console.log(jsonString);
+  try {
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error('Failed to parse JSON:', error);
+    throw new Error('Failed to parse JSON.');
+  }
+}
 
+export const App = () => {
+  const [link, setLink] = useState("");
+  const [responseContent, setResponseContent] = useState("");
+
+// need to check
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await extractText(link);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const text = await response.text();
+//end of welton
       // The content includes JSON within a string, wrapped in triple backticks.
       // We need to extract the JSON part. This might require more sophisticated parsing,
       // especially if the triple backticks can be part of the actual content.
@@ -64,11 +95,39 @@ export const App = () => {
 
       setResponseBody(jsonContent);
 
-      // setResponseBody(body);
-      setState("success");
+
+      try {
+        const token = await auth.getCanvaUserToken();
+        const res = await fetch(BACKEND_HOST_OPENAI, {
+          method: "POST",
+          body: JSON.stringify({ prompt: `Based on a the below research paper, generate a 10 slide presentation in the following structure:\n\nIntroduction and background on topic\nKey contributions / novelties\nResults / datapoints\nImpact / contributions / caveats\n\nUse 2-3 slides per part, and present things as slideshows aimed for a presentation for the general public\n\nUse 2-3 comprehensive, clear, but insightful and value-adding full sentence bullet points per slide max, and generate a sub heading for each slide. Do not make up data and do not make up things that you do not know. Emphasize specific results and data points\n\nRefer to the document, results, and actions. Return it in json format in the following json format: {"title":"<title>", "authors":"<authors", "slides": [{"heading":"<heading>", "body":"<body>"}...]}. Here is the research paper: ` + text }),
+          headers: new Headers({
+            "content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          }),
+        });
+  
+        // const body = await res.json();
+        const body = await res.json();
+        // const processedResponse = processResponseBody(body);
+  
+  
+      // The content includes JSON within a string, wrapped in triple backticks.
+      // We need to extract the JSON part. This might require more sophisticated parsing,
+      // especially if the triple backticks can be part of the actual content.
+      const jsonContentString = parseJsonFromString(body.response);
+  
+      // Parse the JSON string into an object
+      console.log(jsonContentString);
+      await handleNewClick(jsonContentString);
+        // setResponseBody(body);
+      } catch (error) {
+        console.error(error);
+      }
+  
+      console.log(response);
     } catch (error) {
-      setState("error");
-      console.error(error);
+      console.error("Failed to fetch data:", error);
     }
   };
 
@@ -84,7 +143,7 @@ export const App = () => {
   //   return processedText;
   // }
 
-  async function handleNewClick() {
+  async function handleNewClick(responseBody) {
     await addPage({
       elements: [
         // headerElement
@@ -102,11 +161,10 @@ export const App = () => {
             },
             {
               type: "TEXT",
-              children: ["Deep diving into our data with clear direction"], // Center align -- run calculations to find center of page - content offset
-              top: 240,
-              left: 50,
-              width: 600,
-              fontSize: 16,
+              children: [responseBody.authors], // Center align -- run calculations to find center of page - content offset
+              top:0,
+              left:0,
+              width:200,
             },
           ],
           top: 150,
@@ -190,103 +248,41 @@ export const App = () => {
 
   return (
     <div className={styles.scrollContainer}>
-      <Rows spacing="3u">
-        <Text>
-          This example demonstrates how apps can securely communicate with their
-          servers via the browser's Fetch API.
-        </Text>
-
-        {/* Idle and loading state */}
-        {state !== "error" && (
-          <>
-            <Button
-              variant="primary"
-              onClick={sendGetRequest}
-              loading={state === "loading"}
-              stretch
-            >
-              Send GET request
-            </Button>
-            {state === "success" && responseBody && (
-              <FormField
-                label="Response"
-                value={JSON.stringify(responseBody, null, 2)}
-                control={(props) => (
-                  <MultilineInput {...props} maxRows={5} autoGrow readOnly />
-                )}
-              />
-            )}
-          </>
-        )}
-
-        {/* Error state */}
-        {state === "error" && (
-          <Rows spacing="3u">
-            <Rows spacing="1u">
-              <Title size="small">Something went wrong</Title>
-              <Text>To see the error, check the JavaScript Console.</Text>
-            </Rows>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setState("idle");
-              }}
-              stretch
-            >
-              Reset
-            </Button>
-          </Rows>
-        )}
-      </Rows>
-
-      <Button
-        variant="primary"
-        onClick={() => {
-          // First, ensure responseBody is a string. If it's not directly a string, we convert it to string using JSON.stringify.
-          const responseBodyString =
-            typeof responseBody === "string"
-              ? responseBody
-              : JSON.stringify(responseBody);
-
-          // Then, get the first 30 characters of the string.
-          const first30Chars = responseBodyString.slice(0, 30);
-
-          addNativeElement({
-            type: "TEXT",
-            children: [first30Chars],
-          });
-        }}
-        stretch
-      >
-        Add element
-      </Button>
-      <Button variant="primary" onClick={handleNewClick} stretch>
-        Add group element
-      </Button>
+      <form onSubmit={handleSubmit}>
+        <Rows spacing="2u">
+          <Title>Research to Slides</Title>
+          <Text>
+            Welcome to [project], a software meant to streamline research papers
+            into elegant presentations on Canva – be it slides, text, or images.
+          </Text>
+          <ImageCard
+            alt="grass image"
+            ariaLabel="Add image to design"
+            borderRadius="standard"
+            onClick={() => {}}
+            onDragStart={() => {}}
+            thumbnailUrl="https://raw.githubusercontent.com/theAnshulGupta/theanshulgupta.github.io/master/diagram.png"
+          />
+          <Text>
+            Enter a link below of a research paper listed on the web to generate
+            a slideshow template.
+          </Text>
+          <TextInput
+            value={link}
+            onChange={(value) => setLink(value)}
+            placeholder="Enter Link Here"
+          />
+          <Button variant="primary" type="submit" stretch>
+            Generate Presentation
+          </Button>
+          {responseContent && (
+            <Text>
+              <pre>{responseContent}</pre>
+            </Text>
+          )}
+        </Rows>
+      </form>
     </div>
   );
 };
 
-// const [state, setState] = useState<State>("idle");
-// const [responseBody, setResponseBody] = useState<unknown | undefined>(
-//   undefined
-// );
-
-// const sendGetRequest = async () => {
-//   try {
-//     setState("loading");
-//     const token = await auth.getCanvaUserToken();
-//     const res = await fetch(BACKEND_URL, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-
-//     const body = await res.json();
-//     setResponseBody(body);
-//     setState("success");
-//   } catch (error) {
-//     setState("error");
-//     console.error(error);
-//   }
-// };
