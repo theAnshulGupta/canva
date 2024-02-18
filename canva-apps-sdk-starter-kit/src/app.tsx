@@ -18,7 +18,6 @@ import styles from "styles/components.css";
 import { addNativeElement } from "@canva/design";
 import { addPage } from "@canva/design";
 import {extractText} from "./extractText";
-import * as designer from "./designer";
 
 const BACKEND_URL = `${BACKEND_HOST}/custom-route`;
 const BACKEND_HOST_OPENAI = `${BACKEND_HOST}/openai`; // Change 3000 to your server's port
@@ -32,6 +31,17 @@ export function parseJsonFromString(text) {
   if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
     throw new Error('Invalid string format for JSON parsing.');
   }
+
+
+  const jsonString = text.substring(startIndex, endIndex + 1).replace(/(\r\n|\n|\r)/gm,"");
+  console.log(jsonString);
+  try {
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error('Failed to parse JSON:', error);
+    throw new Error('Failed to parse JSON.');
+  }
+}
 
 export const App = () => {
   const [state, setState] = useState<State>("idle");
@@ -55,15 +65,6 @@ export const App = () => {
         }),
       });
 
-
-  const jsonString = text.substring(startIndex, endIndex + 1).replace(/(\r\n|\n|\r)/gm,"");
-  console.log(jsonString);
-  try {
-    return JSON.parse(jsonString);
-  } catch (error) {
-    console.error('Failed to parse JSON:', error);
-    throw new Error('Failed to parse JSON.');
-  }
 }
 
 export const App = () => {
